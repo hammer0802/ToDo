@@ -5,8 +5,8 @@ import android.content.SharedPreferences
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
-import android.view.inputmethod.EditorInfo
-import android.widget.Button
+import android.view.View
+import android.widget.TextView
 import com.google.gson.Gson
 import com.hammer.app.todo.R
 import com.hammer.app.todo.MyRecyclerAdapter
@@ -16,7 +16,7 @@ import kotlinx.android.synthetic.main.content_main.*
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
-    private val preference: SharedPreferences by lazy { getSharedPreferences("ToDo", Context.MODE_PRIVATE)}
+    private val preference: SharedPreferences by lazy { getSharedPreferences("ToDo", Context.MODE_PRIVATE) }
     val gson = Gson()
     private val list: MutableList<Item> = mutableListOf()
     private val recyclerAdaptor = MyRecyclerAdapter(this)
@@ -28,6 +28,15 @@ class MainActivity : AppCompatActivity() {
         listRefresh()
         recyclerViewRefresh()
 
+        var count = 0
+        for (i in 0 until list.size) {
+            if (!list[i].isChecked) count++
+        }
+        val left = "$count items left"
+        leftNum.text = left
+
+        if (list.any { it.isChecked }) clear.visibility = View.VISIBLE else clear.visibility = View.INVISIBLE
+
         add.setOnClickListener {
             if (editText.text.isNotBlank() && editText.text.isNotEmpty()) {
                 val item = Item(editText.text.toString(), false, Date())
@@ -37,18 +46,26 @@ class MainActivity : AppCompatActivity() {
                 e.apply()
                 listRefresh()
                 recyclerViewRefresh()
+                if (list.any { it.isChecked }) clear.visibility = View.VISIBLE else clear.visibility = View.INVISIBLE
             }
+        }
+
+        allCheck.setOnClickListener {
+            if (allCheck.isChecked) list.forEach { it.isChecked = true } else list.forEach { it.isChecked = false }
+            listRefresh()
+            recyclerViewRefresh()
+            if (list.any { it.isChecked }) clear.visibility = View.VISIBLE else clear.visibility = View.INVISIBLE
         }
     }
 
-    private fun recyclerViewRefresh(){
+    private fun recyclerViewRefresh() {
         recycler_view.layoutManager = LinearLayoutManager(this)
         recycler_view.adapter = recyclerAdaptor
         recyclerAdaptor.load()
         recycler_view.adapter!!.notifyDataSetChanged()
     }
 
-    private fun listRefresh(){
+    private fun listRefresh() {
         list.clear()
         list.addAll(preference.all.values.filterIsInstance(String::class.java).map { value ->
             gson.fromJson<Item>(value, Item::class.java)

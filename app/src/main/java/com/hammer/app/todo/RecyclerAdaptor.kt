@@ -1,11 +1,8 @@
 package com.hammer.app.todo
 
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
-import android.os.Handler
 import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,7 +16,7 @@ import com.hammer.app.todo.main.MainActivity
 class MyRecyclerAdapter(val activity: MainActivity): RecyclerView.Adapter<MyRecyclerViewHolder>() {
     private val preference: SharedPreferences by lazy { activity.getSharedPreferences("ToDo", Context.MODE_PRIVATE)}
     val gson = Gson()
-    val list: MutableList<Item> = mutableListOf()
+    private val list: MutableList<Item> = mutableListOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyRecyclerViewHolder {
 
@@ -32,25 +29,41 @@ class MyRecyclerAdapter(val activity: MainActivity): RecyclerView.Adapter<MyRecy
     }
 
     override fun onBindViewHolder(holder: MyRecyclerViewHolder, position: Int) {
-        val listItem = "${list[position].content}"
+        val listItem = list[position].content
         val isChecked = list[position].isChecked
         val checkBox = holder.v.findViewById<CheckBox>(R.id.checkBox)
         holder.v.findViewById<TextView>(R.id.list_item).text = listItem
         checkBox.isChecked = isChecked
 
-        holder.v.setOnClickListener{
-            checkBox.isChecked =  !checkBox.isChecked
-            val deleteBtn = holder.v.findViewById<Button>(R.id.deleteButton)
-            if (checkBox.isChecked) deleteBtn.visibility = View.VISIBLE else deleteBtn.visibility = View.INVISIBLE
+        fun clickCheckBox(){
+            val clear = activity.findViewById<Button>(R.id.clear)
+            list[position].isChecked = !list[position].isChecked
+            if(list.any { it.isChecked }) clear.visibility = View.VISIBLE else clear.visibility = View.INVISIBLE
+            var count = 0
+            for(i in 0 until itemCount){
+                if(!list[i].isChecked) count++
+            }
+            val left = "$count items left"
+            activity.findViewById<TextView>(R.id.leftNum).text = left
+
         }
 
-        holder.v.findViewById<Button>(R.id.deleteButton).setOnClickListener {
+        fun itemChange(){
             val e = preference.edit()
             e.remove(list[position].date.toString())
+            e.putString(list[position].date.toString(), gson.toJson(list[position]))
             e.apply()
-            list.removeAt(position)
-            notifyItemRemoved(position)
-            notifyItemRangeChanged(position, list.size)
+        }
+
+        holder.v.setOnClickListener{
+            clickCheckBox()
+            checkBox.isChecked = !checkBox.isChecked
+            itemChange()
+        }
+
+        checkBox.setOnClickListener {
+            clickCheckBox()
+            itemChange()
         }
 
     }
@@ -62,6 +75,7 @@ class MyRecyclerAdapter(val activity: MainActivity): RecyclerView.Adapter<MyRecy
         })
         list.sortBy { it.date }
     }
+
 }
 
 class MyRecyclerViewHolder(val v: View): RecyclerView.ViewHolder(v)
