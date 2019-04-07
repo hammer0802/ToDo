@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">ToDo</string>
+    <string name="list_item">item</string>
+    <string name="left_value">x items left</string>
+    <string name="hint">What needs to be done?</string>
+    <string name="button_all">All</string>
+    <string name="button_active">Active</string>
+    <string name="button_competed">Completed</string>
+    <string name="button_clear">Clear completed</string>
+    <string name="delete">Delete</string>
+    <string name="button_add">Add</string>
+</resources>
