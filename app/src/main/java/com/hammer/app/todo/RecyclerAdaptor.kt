@@ -76,6 +76,24 @@ class MyRecyclerAdapter(val activity: MainActivity): RecyclerView.Adapter<MyRecy
         list.sortBy { it.date }
     }
 
+    fun activeLoad(){
+        list.clear()
+        list.addAll(preference.all.values.filterIsInstance(String::class.java).map { value ->
+            gson.fromJson<Item>(value, Item::class.java)
+        })
+        list.sortBy { it.date }
+        list.removeAll { it.isChecked }
+    }
+
+    fun completedLoad(){
+        list.clear()
+        list.addAll(preference.all.values.filterIsInstance(String::class.java).map { value ->
+            gson.fromJson<Item>(value, Item::class.java)
+        })
+        list.sortBy { it.date }
+        list.retainAll { it.isChecked }
+    }
+
 }
 
 class MyRecyclerViewHolder(val v: View): RecyclerView.ViewHolder(v)

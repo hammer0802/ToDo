@@ -99,7 +99,6 @@
                 android:minWidth="0dp"
                 android:padding="5dp"
                 android:id="@+id/all"
-                android:background="#ffffff"
                 app:layout_constraintCircleRadius="5dp"
                 app:layout_constraintTop_toTopOf="parent"
                 android:textAllCaps="false"
@@ -107,7 +106,7 @@
                 android:layout_marginTop="8dp" android:layout_marginBottom="8dp"
                 app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toEndOf="@+id/leftNum"
                 android:layout_marginStart="8dp" app:layout_constraintEnd_toStartOf="@+id/active"
-                android:layout_marginEnd="8dp"/>
+                android:layout_marginEnd="8dp" android:background="#dcdcdc"/>
         <Button
                 android:text="@string/button_active"
                 android:layout_width="wrap_content"
