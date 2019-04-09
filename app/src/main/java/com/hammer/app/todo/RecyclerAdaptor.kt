@@ -13,14 +13,14 @@ import com.google.gson.Gson
 import com.hammer.app.todo.data.Item
 import com.hammer.app.todo.main.MainActivity
 
-class MyRecyclerAdapter(private val activity: MainActivity): RecyclerView.Adapter<MyRecyclerViewHolder>() {
-    private val preference: SharedPreferences by lazy { activity.getSharedPreferences("ToDo", Context.MODE_PRIVATE)}
-    val gson = Gson()
+class MyRecyclerAdapter(private val activity: MainActivity) : RecyclerView.Adapter<MyRecyclerViewHolder>() {
+    private val preference: SharedPreferences by lazy { activity.getSharedPreferences("ToDo", Context.MODE_PRIVATE) }
+    private val gson = Gson()
     private val list: MutableList<Item> = mutableListOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyRecyclerViewHolder {
 
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.list_main, parent,false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.list_main, parent, false)
         return MyRecyclerViewHolder(view)
     }
 
@@ -35,26 +35,26 @@ class MyRecyclerAdapter(private val activity: MainActivity): RecyclerView.Adapte
         holder.v.findViewById<TextView>(R.id.list_item).text = listItem
         checkBox.isChecked = isChecked
 
-        fun itemChange(){
+        fun itemChange() {
             val e = preference.edit()
             e.remove(list[position].date.toString())
             e.putString(list[position].date.toString(), gson.toJson(list[position]))
             e.apply()
         }
 
-        fun clickCheckBox(){
+        fun clickCheckBox() {
             val clear = activity.findViewById<Button>(R.id.clear)
             list[position].isChecked = !list[position].isChecked
-            if(list.any { it.isChecked }) clear.visibility = View.VISIBLE else clear.visibility = View.INVISIBLE
+            if (list.any { it.isChecked }) clear.visibility = View.VISIBLE else clear.visibility = View.INVISIBLE
             var count = 0
-            for(i in 0 until itemCount){
-                if(!list[i].isChecked) count++
+            for (i in 0 until itemCount) {
+                if (!list[i].isChecked) count++
             }
             val left = "$count items left"
             activity.findViewById<TextView>(R.id.leftNum).text = left
         }
 
-        holder.v.setOnClickListener{
+        holder.v.setOnClickListener {
             clickCheckBox()
             checkBox.isChecked = !checkBox.isChecked
             itemChange()
@@ -69,7 +69,7 @@ class MyRecyclerAdapter(private val activity: MainActivity): RecyclerView.Adapte
 
     }
 
-    fun load(){
+    fun load() {
         list.clear()
         list.addAll(preference.all.values.filterIsInstance(String::class.java).map { value ->
             gson.fromJson<Item>(value, Item::class.java)
@@ -77,7 +77,7 @@ class MyRecyclerAdapter(private val activity: MainActivity): RecyclerView.Adapte
         list.sortBy { it.date }
     }
 
-    fun activeLoad(){
+    fun activeLoad() {
         list.clear()
         list.addAll(preference.all.values.filterIsInstance(String::class.java).map { value ->
             gson.fromJson<Item>(value, Item::class.java)
@@ -86,7 +86,7 @@ class MyRecyclerAdapter(private val activity: MainActivity): RecyclerView.Adapte
         list.removeAll { it.isChecked }
     }
 
-    fun completedLoad(){
+    fun completedLoad() {
         list.clear()
         list.addAll(preference.all.values.filterIsInstance(String::class.java).map { value ->
             gson.fromJson<Item>(value, Item::class.java)
@@ -95,7 +95,7 @@ class MyRecyclerAdapter(private val activity: MainActivity): RecyclerView.Adapte
         list.retainAll { it.isChecked }
     }
 
-    fun clear(position: Int){
+    fun clear(position: Int) {
         load()
         val e = preference.edit()
         e.remove(list[position].date.toString())
@@ -106,5 +106,5 @@ class MyRecyclerAdapter(private val activity: MainActivity): RecyclerView.Adapte
     }
 }
 
-class MyRecyclerViewHolder(val v: View): RecyclerView.ViewHolder(v)
+class MyRecyclerViewHolder(val v: View) : RecyclerView.ViewHolder(v)
 

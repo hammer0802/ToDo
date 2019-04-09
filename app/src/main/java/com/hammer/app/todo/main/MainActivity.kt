@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
-import android.widget.TextView
 import com.google.gson.Gson
 import com.hammer.app.todo.R
 import com.hammer.app.todo.MyRecyclerAdapter
@@ -19,10 +18,10 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
     private val preference: SharedPreferences by lazy { getSharedPreferences("ToDo", Context.MODE_PRIVATE) }
-    val gson = Gson()
+    private val gson = Gson()
     private val list: MutableList<Item> = mutableListOf()
     private val recyclerAdaptor = MyRecyclerAdapter(this)
-    var filter = Filter.ALL
+    private var filter = Filter.ALL
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,7 +92,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         clear.setOnClickListener {
-            var checkedList:MutableList<Int> = mutableListOf()
+            val checkedList:MutableList<Int> = mutableListOf()
             listRefresh()
             for(i in 0 until list.size) {
                 if(list[i].isChecked){
