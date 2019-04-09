@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
     val gson = Gson()
     private val list: MutableList<Item> = mutableListOf()
     private val recyclerAdaptor = MyRecyclerAdapter(this)
-    private var filter = Filter.ALL
+    var filter = Filter.ALL
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,22 +42,7 @@ class MainActivity : AppCompatActivity() {
                 val e = preference.edit()
                 e.putString(item.date.toString(), gson.toJson(item))
                 e.apply()
-                when (filter) {
-                    Filter.ALL -> {
-                        listRefresh()
-                        recyclerViewRefresh()
-                    }
-                    Filter.ACTIVE -> {
-                        listRefresh()
-                        list.removeAll { it.isChecked }
-                        activeRecyclerViewRefresh()
-                    }
-                    Filter.COMPLETED -> {
-                        listRefresh()
-                        list.retainAll { it.isChecked }
-                        completedRecyclerViewRefresh()
-                    }
-                }
+                filter()
                 if (list.any { it.isChecked }) clear.visibility = View.VISIBLE
                 else {
                     clear.visibility = View.INVISIBLE
@@ -76,22 +61,7 @@ class MainActivity : AppCompatActivity() {
                 e.putString(list[i].date.toString(), gson.toJson(list[i]))
             }
             e.apply()
-            when (filter) {
-                Filter.ALL -> {
-                    listRefresh()
-                    recyclerViewRefresh()
-                }
-                Filter.ACTIVE -> {
-                    listRefresh()
-                    list.removeAll { it.isChecked }
-                    activeRecyclerViewRefresh()
-                }
-                Filter.COMPLETED -> {
-                    listRefresh()
-                    list.retainAll { it.isChecked }
-                    completedRecyclerViewRefresh()
-                }
-            }
+            filter()
             if (allCheck.isChecked) clear.visibility = View.VISIBLE else clear.visibility = View.INVISIBLE
             count()
         }
@@ -180,5 +150,24 @@ class MainActivity : AppCompatActivity() {
         }
         val left = "$count items left"
         leftNum.text = left
+    }
+
+    fun filter(){
+        when (filter) {
+            Filter.ALL -> {
+                listRefresh()
+                recyclerViewRefresh()
+            }
+            Filter.ACTIVE -> {
+                listRefresh()
+                list.removeAll { it.isChecked }
+                activeRecyclerViewRefresh()
+            }
+            Filter.COMPLETED -> {
+                listRefresh()
+                list.retainAll { it.isChecked }
+                completedRecyclerViewRefresh()
+            }
+        }
     }
 }

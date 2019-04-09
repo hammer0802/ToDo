@@ -35,6 +35,13 @@ class MyRecyclerAdapter(private val activity: MainActivity): RecyclerView.Adapte
         holder.v.findViewById<TextView>(R.id.list_item).text = listItem
         checkBox.isChecked = isChecked
 
+        fun itemChange(){
+            val e = preference.edit()
+            e.remove(list[position].date.toString())
+            e.putString(list[position].date.toString(), gson.toJson(list[position]))
+            e.apply()
+        }
+
         fun clickCheckBox(){
             val clear = activity.findViewById<Button>(R.id.clear)
             list[position].isChecked = !list[position].isChecked
@@ -47,22 +54,17 @@ class MyRecyclerAdapter(private val activity: MainActivity): RecyclerView.Adapte
             activity.findViewById<TextView>(R.id.leftNum).text = left
         }
 
-        fun itemChange(){
-            val e = preference.edit()
-            e.remove(list[position].date.toString())
-            e.putString(list[position].date.toString(), gson.toJson(list[position]))
-            e.apply()
-        }
-
         holder.v.setOnClickListener{
             clickCheckBox()
             checkBox.isChecked = !checkBox.isChecked
             itemChange()
+            activity.filter()
         }
 
         checkBox.setOnClickListener {
             clickCheckBox()
             itemChange()
+            activity.filter()
         }
 
     }
