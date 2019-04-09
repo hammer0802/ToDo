@@ -13,7 +13,7 @@ import com.google.gson.Gson
 import com.hammer.app.todo.data.Item
 import com.hammer.app.todo.main.MainActivity
 
-class MyRecyclerAdapter(val activity: MainActivity): RecyclerView.Adapter<MyRecyclerViewHolder>() {
+class MyRecyclerAdapter(private val activity: MainActivity): RecyclerView.Adapter<MyRecyclerViewHolder>() {
     private val preference: SharedPreferences by lazy { activity.getSharedPreferences("ToDo", Context.MODE_PRIVATE)}
     val gson = Gson()
     private val list: MutableList<Item> = mutableListOf()
@@ -45,7 +45,6 @@ class MyRecyclerAdapter(val activity: MainActivity): RecyclerView.Adapter<MyRecy
             }
             val left = "$count items left"
             activity.findViewById<TextView>(R.id.leftNum).text = left
-
         }
 
         fun itemChange(){
@@ -94,6 +93,15 @@ class MyRecyclerAdapter(val activity: MainActivity): RecyclerView.Adapter<MyRecy
         list.retainAll { it.isChecked }
     }
 
+    fun clear(position: Int){
+        load()
+        val e = preference.edit()
+        e.remove(list[position].date.toString())
+        e.apply()
+        list.removeAt(position)
+        notifyItemRemoved(position)
+        notifyItemRangeChanged(position, list.size)
+    }
 }
 
 class MyRecyclerViewHolder(val v: View): RecyclerView.ViewHolder(v)

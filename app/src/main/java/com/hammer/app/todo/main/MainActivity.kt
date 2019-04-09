@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
     val gson = Gson()
     private val list: MutableList<Item> = mutableListOf()
     private val recyclerAdaptor = MyRecyclerAdapter(this)
-    var filter = Filter.ALL
+    private var filter = Filter.ALL
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
                 val e = preference.edit()
                 e.putString(item.date.toString(), gson.toJson(item))
                 e.apply()
-                when(filter) {
+                when (filter) {
                     Filter.ALL -> {
                         listRefresh()
                         recyclerViewRefresh()
@@ -52,15 +52,17 @@ class MainActivity : AppCompatActivity() {
                         list.removeAll { it.isChecked }
                         activeRecyclerViewRefresh()
                     }
-                    Filter.COMPLETED ->{
+                    Filter.COMPLETED -> {
                         listRefresh()
                         list.retainAll { it.isChecked }
                         completedRecyclerViewRefresh()
                     }
                 }
-
-
-                if (list.any { it.isChecked }) clear.visibility = View.VISIBLE else clear.visibility = View.INVISIBLE
+                if (list.any { it.isChecked }) clear.visibility = View.VISIBLE
+                else {
+                    clear.visibility = View.INVISIBLE
+                    allCheck.isChecked = false
+                }
                 count()
             }
         }
@@ -70,11 +72,11 @@ class MainActivity : AppCompatActivity() {
             recyclerViewRefresh()
             if (allCheck.isChecked) list.forEach { it.isChecked = true } else list.forEach { it.isChecked = false }
             val e = preference.edit()
-            for(i in 0 until list.size) {
+            for (i in 0 until list.size) {
                 e.putString(list[i].date.toString(), gson.toJson(list[i]))
             }
             e.apply()
-            when(filter) {
+            when (filter) {
                 Filter.ALL -> {
                     listRefresh()
                     recyclerViewRefresh()
@@ -84,13 +86,13 @@ class MainActivity : AppCompatActivity() {
                     list.removeAll { it.isChecked }
                     activeRecyclerViewRefresh()
                 }
-                Filter.COMPLETED ->{
+                Filter.COMPLETED -> {
                     listRefresh()
                     list.retainAll { it.isChecked }
                     completedRecyclerViewRefresh()
                 }
             }
-            if (list.any { it.isChecked }) clear.visibility = View.VISIBLE else clear.visibility = View.INVISIBLE
+            if (allCheck.isChecked) clear.visibility = View.VISIBLE else clear.visibility = View.INVISIBLE
             count()
         }
 
@@ -118,6 +120,26 @@ class MainActivity : AppCompatActivity() {
             list.retainAll { it.isChecked }
             completedRecyclerViewRefresh()
             filter = Filter.COMPLETED
+        }
+
+        clear.setOnClickListener {
+            var checkedList:MutableList<Int> = mutableListOf()
+            listRefresh()
+            for(i in 0 until list.size) {
+                if(list[i].isChecked){
+                    checkedList.add(i)
+                }
+            }
+            checkedList.sortDescending()
+            checkedList.forEach { recyclerAdaptor.clear(it) }
+            listRefresh()
+            recyclerViewRefresh()
+            if (list.any { it.isChecked }) clear.visibility = View.VISIBLE
+            else {
+                clear.visibility = View.INVISIBLE
+                allCheck.isChecked = false
+            }
+            count()
         }
     }
 
@@ -150,8 +172,9 @@ class MainActivity : AppCompatActivity() {
         list.sortBy { it.date }
     }
 
-    private fun count(){
+    private fun count() {
         var count = 0
+        listRefresh()
         for (i in 0 until list.size) {
             if (!list[i].isChecked) count++
         }
