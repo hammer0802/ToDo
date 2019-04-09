@@ -28,7 +28,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+        recycler_view.layoutManager = LinearLayoutManager(this)
+        recycler_view.adapter = recyclerAdaptor
         listRefresh()
         recyclerViewRefresh()
 
@@ -53,18 +54,23 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-
-
         val mIth = ItemTouchHelper(
             object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, ItemTouchHelper.LEFT) {
+                override fun onMove(
+                    p0: RecyclerView,
+                    p1: RecyclerView.ViewHolder,
+                    p2: RecyclerView.ViewHolder
+                ): Boolean {
+                    return false
+                    }
                 override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                     val fromPos = viewHolder.adapterPosition
-                    dataset.remove(fromPos)
-                    adapter.notifyItemRemoved(fromPos)
+                    recyclerAdaptor.clear(fromPos)
+                    count()
                 }
 
             })
-        mIth.attachToRecyclerView()
+        mIth.attachToRecyclerView(recycler_view)
 
         allCheck.setOnClickListener {
             listRefresh()
@@ -128,22 +134,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun recyclerViewRefresh() {
-        recycler_view.layoutManager = LinearLayoutManager(this)
-        recycler_view.adapter = recyclerAdaptor
         recyclerAdaptor.load()
         recycler_view.adapter!!.notifyDataSetChanged()
     }
 
     private fun activeRecyclerViewRefresh() {
-        recycler_view.layoutManager = LinearLayoutManager(this)
-        recycler_view.adapter = recyclerAdaptor
         recyclerAdaptor.activeLoad()
         recycler_view.adapter!!.notifyDataSetChanged()
     }
 
     private fun completedRecyclerViewRefresh() {
-        recycler_view.layoutManager = LinearLayoutManager(this)
-        recycler_view.adapter = recyclerAdaptor
         recyclerAdaptor.completedLoad()
         recycler_view.adapter!!.notifyDataSetChanged()
     }
