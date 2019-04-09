@@ -6,6 +6,8 @@ import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.View
 import com.google.gson.Gson
 import com.hammer.app.todo.R
@@ -50,6 +52,19 @@ class MainActivity : AppCompatActivity() {
                 count()
             }
         }
+
+
+
+        val mIth = ItemTouchHelper(
+            object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, ItemTouchHelper.LEFT) {
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                    val fromPos = viewHolder.adapterPosition
+                    dataset.remove(fromPos)
+                    adapter.notifyItemRemoved(fromPos)
+                }
+
+            })
+        mIth.attachToRecyclerView()
 
         allCheck.setOnClickListener {
             listRefresh()
