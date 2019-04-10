@@ -35,6 +35,7 @@ class MyRecyclerAdapter(private val activity: MainActivity) : RecyclerView.Adapt
         holder.v.findViewById<TextView>(R.id.list_item).text = listItem
         checkBox.isChecked = isChecked
 
+        //list内容が変更されたらSharedPreferenceに反映する
         fun itemChange() {
             val e = preference.edit()
             e.remove(list[position].date.toString())
@@ -42,6 +43,7 @@ class MyRecyclerAdapter(private val activity: MainActivity) : RecyclerView.Adapt
             e.apply()
         }
 
+        //RecyclerView itemのcheckboxがクリックされた時の処理
         fun clickCheckBox() {
             val clear = activity.findViewById<Button>(R.id.clear)
             list[position].isChecked = !list[position].isChecked
@@ -54,6 +56,7 @@ class MyRecyclerAdapter(private val activity: MainActivity) : RecyclerView.Adapt
             activity.findViewById<TextView>(R.id.leftNum).text = left
         }
 
+        //RecyclerView itemクリック時
         holder.v.setOnClickListener {
             clickCheckBox()
             checkBox.isChecked = !checkBox.isChecked
@@ -61,14 +64,15 @@ class MyRecyclerAdapter(private val activity: MainActivity) : RecyclerView.Adapt
             activity.filter()
         }
 
+        //RecyclerView itemのcheckboxクリック時
         checkBox.setOnClickListener {
             clickCheckBox()
             itemChange()
             activity.filter()
         }
-
     }
 
+    //Filter.ALL時のlist更新
     fun load() {
         list.clear()
         list.addAll(preference.all.values.filterIsInstance(String::class.java).map { value ->
@@ -77,6 +81,7 @@ class MyRecyclerAdapter(private val activity: MainActivity) : RecyclerView.Adapt
         list.sortBy { it.date }
     }
 
+    //Filter.ACTIVE時のlist更新
     fun activeLoad() {
         list.clear()
         list.addAll(preference.all.values.filterIsInstance(String::class.java).map { value ->
@@ -86,6 +91,7 @@ class MyRecyclerAdapter(private val activity: MainActivity) : RecyclerView.Adapt
         list.removeAll { it.isChecked }
     }
 
+    //Filter.COMPLETED時のlist更新
     fun completedLoad() {
         list.clear()
         list.addAll(preference.all.values.filterIsInstance(String::class.java).map { value ->
@@ -95,6 +101,7 @@ class MyRecyclerAdapter(private val activity: MainActivity) : RecyclerView.Adapt
         list.retainAll { it.isChecked }
     }
 
+    //RecyclerView itemの削除処理
     fun clear(position: Int) {
         load()
         val e = preference.edit()

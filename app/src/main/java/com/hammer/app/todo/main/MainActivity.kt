@@ -30,13 +30,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         recycler_view.layoutManager = LinearLayoutManager(this)
         recycler_view.adapter = recyclerAdaptor
+
+        //listおよびRecycler Viewデータのリフレッシュ
         listRefresh()
         recyclerViewRefresh()
-
         count()
-
         if (list.any { it.isChecked }) clear.visibility = View.VISIBLE else clear.visibility = View.INVISIBLE
 
+        //item追加ボタンクリック時
         add.setOnClickListener {
             if (editText.text.isNotBlank() && editText.text.isNotEmpty()) {
                 val item = Item(editText.text.toString(), false, Date())
@@ -50,29 +51,12 @@ class MainActivity : AppCompatActivity() {
                     clear.visibility = View.INVISIBLE
                     allCheck.isChecked = false
                 }
-                if(allCheck.isChecked &&(filter == Filter.COMPLETED || filter == Filter.ALL)) allCheck.isChecked = false
+                if (allCheck.isChecked && (filter == Filter.COMPLETED || filter == Filter.ALL)) allCheck.isChecked = false
                 count()
             }
         }
 
-        val mIth = ItemTouchHelper(
-            object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, ItemTouchHelper.LEFT) {
-                override fun onMove(
-                    p0: RecyclerView,
-                    p1: RecyclerView.ViewHolder,
-                    p2: RecyclerView.ViewHolder
-                ): Boolean {
-                    return false
-                    }
-                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                    val fromPos = viewHolder.adapterPosition
-                    recyclerAdaptor.clear(fromPos)
-                    count()
-                }
-
-            })
-        mIth.attachToRecyclerView(recycler_view)
-
+        //全選択ボタンクリック時
         allCheck.setOnClickListener {
             listRefresh()
             recyclerViewRefresh()
@@ -87,6 +71,7 @@ class MainActivity : AppCompatActivity() {
             count()
         }
 
+        //Allフィルターボタンクリック時
         all.setOnClickListener {
             all.setBackgroundColor(Color.parseColor("#dcdcdc"))
             active.setBackgroundColor(Color.parseColor("#ffffff"))
@@ -95,6 +80,7 @@ class MainActivity : AppCompatActivity() {
             filter = Filter.ALL
         }
 
+        //Activeフィルターボタンクリック時
         active.setOnClickListener {
             all.setBackgroundColor(Color.parseColor("#ffffff"))
             active.setBackgroundColor(Color.parseColor("#dcdcdc"))
@@ -104,6 +90,7 @@ class MainActivity : AppCompatActivity() {
             filter = Filter.ACTIVE
         }
 
+        //Completedフィルターボタンクリック時
         completed.setOnClickListener {
             all.setBackgroundColor(Color.parseColor("#ffffff"))
             active.setBackgroundColor(Color.parseColor("#ffffff"))
@@ -113,11 +100,12 @@ class MainActivity : AppCompatActivity() {
             filter = Filter.COMPLETED
         }
 
+        //Clear completedボタンクリック時
         clear.setOnClickListener {
-            val checkedList:MutableList<Int> = mutableListOf()
+            val checkedList: MutableList<Int> = mutableListOf()
             listRefresh()
-            for(i in 0 until list.size) {
-                if(list[i].isChecked){
+            for (i in 0 until list.size) {
+                if (list[i].isChecked) {
                     checkedList.add(i)
                 }
             }
@@ -132,23 +120,47 @@ class MainActivity : AppCompatActivity() {
             }
             count()
         }
+
+        //左スワイプで削除する処理
+        val mIth = ItemTouchHelper(
+            object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, ItemTouchHelper.LEFT) {
+                override fun onMove(
+                    p0: RecyclerView,
+                    p1: RecyclerView.ViewHolder,
+                    p2: RecyclerView.ViewHolder
+                ): Boolean {
+                    return false
+                }
+
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                    val fromPos = viewHolder.adapterPosition
+                    recyclerAdaptor.clear(fromPos)
+                    count()
+                }
+
+            })
+        mIth.attachToRecyclerView(recycler_view)
     }
 
+    //Allフィルター時のRecyclerViewをリフレッシュ
     private fun recyclerViewRefresh() {
         recyclerAdaptor.load()
         recycler_view.adapter!!.notifyDataSetChanged()
     }
 
+    //Activeフィルター時のRecyclerViewをリフレッシュ
     private fun activeRecyclerViewRefresh() {
         recyclerAdaptor.activeLoad()
         recycler_view.adapter!!.notifyDataSetChanged()
     }
 
+    //Completedフィルター時のRecyclerViewをリフレッシュ
     private fun completedRecyclerViewRefresh() {
         recyclerAdaptor.completedLoad()
         recycler_view.adapter!!.notifyDataSetChanged()
     }
 
+    //listのリフレッシュ
     private fun listRefresh() {
         list.clear()
         list.addAll(preference.all.values.filterIsInstance(String::class.java).map { value ->
@@ -157,6 +169,7 @@ class MainActivity : AppCompatActivity() {
         list.sortBy { it.date }
     }
 
+    //Activeなitemの個数カウント機能
     private fun count() {
         var count = 0
         listRefresh()
@@ -167,7 +180,8 @@ class MainActivity : AppCompatActivity() {
         leftNum.text = left
     }
 
-    fun filter(){
+    //filterごとの状況別処理
+    fun filter() {
         when (filter) {
             Filter.ALL -> {
                 listRefresh()

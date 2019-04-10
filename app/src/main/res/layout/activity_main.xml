@@ -63,15 +63,15 @@
 
     </android.support.constraint.ConstraintLayout>
 
-        <include
-                android:id="@+id/include"
-                layout="@layout/content_main"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                ads:layout_constraintBottom_toTopOf="@+id/bottom"
-                ads:layout_constraintEnd_toEndOf="parent"
-                ads:layout_constraintStart_toStartOf="parent"
-                ads:layout_constraintTop_toBottomOf="@+id/top" />
+    <include
+            android:id="@+id/include"
+            layout="@layout/content_main"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            ads:layout_constraintBottom_toTopOf="@+id/bottom"
+            ads:layout_constraintEnd_toEndOf="parent"
+            ads:layout_constraintStart_toStartOf="parent"
+            ads:layout_constraintTop_toBottomOf="@+id/top"/>
 
     <android.support.constraint.ConstraintLayout
             android:id="@+id/bottom"
