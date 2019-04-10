@@ -50,6 +50,7 @@ class MainActivity : AppCompatActivity() {
                     clear.visibility = View.INVISIBLE
                     allCheck.isChecked = false
                 }
+                if(allCheck.isChecked &&(filter == Filter.COMPLETED || filter == Filter.ALL)) allCheck.isChecked = false
                 count()
             }
         }
